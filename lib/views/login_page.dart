@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_apps/services/auth_service.dart';
 import 'package:inventory_apps/utils/color.dart';
-import 'package:inventory_apps/views/dashboard.dart';
+import 'package:inventory_apps/views/dashboard_router.dart';
+import 'package:inventory_apps/views/register_page.dart';
 import 'package:inventory_apps/widgets/button/custom_button.dart';
 import 'package:inventory_apps/widgets/form/custom_text_field.dart';
 import 'package:lottie/lottie.dart';
@@ -14,14 +15,14 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -48,15 +49,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       text: const TextSpan(
                         children: [
                           TextSpan(
-                            text: 'Inventory',
+                            text: 'Futsal',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.primaryBlue,
+                              color: Color(0xFF22C55E),
                             ),
                           ),
                           TextSpan(
-                            text: 'Apps',
+                            text: 'Booking',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.w800,
@@ -70,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 4),
 
                     const Text(
-                      'Manage Your Inventory Efficiently',
+                      'Book Your Futsal Field Easily',
                       style: TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,
@@ -89,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 24),
 
                     CustomTextField(
-                      controller: _usernameController,
+                      controller: _emailController,
                       hint: 'Email',
                       keyboardType: TextInputType.emailAddress,
                       prefixIcon: Icons.email_outlined,
@@ -117,53 +118,92 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 28),
                     _isLoading
-                        ? CircularProgressIndicator(
-                            color: AppColors.primaryBlue,
+                        ? const CircularProgressIndicator(
+                            color: Color(0xFF22C55E),
                           )
                         : CustomButton(
                             label: 'Login',
                             onTap: () async {
-                              final username = _usernameController;
+                              final email = _emailController;
                               final password = _passwordController;
-                              if (username.text.isEmpty ||
-                                  password.text.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      "Username tidak boleh kosong",
+                              if (email.text.isEmpty || password.text.isEmpty) {
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Email dan password tidak boleh kosong",
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                }
                                 return;
                               }
                               setState(() {
                                 _isLoading = true;
                               });
-                              bool isSucces = await AuthService.login(
-                                username.text,
+                              bool isSuccess = await AuthService.login(
+                                email.text,
                                 password.text,
                               );
-                              setState(() {
-                                _isLoading = false;
-                              });
-                              if (isSucces) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DashboardScreen(),
-                                  ),
-                                );
+                              if (mounted) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                              }
+                              if (isSuccess) {
+                                if (mounted) {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const DashboardRouter(),
+                                    ),
+                                  );
+                                }
                               } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text("Login Gagal!"),
-                                    backgroundColor: Colors.red,
-                                  )
-                                );
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Login Gagal! Periksa email dan password Anda.",
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
                               }
                             },
-                            backgroundColor: AppColors.primaryBlue,
+                            backgroundColor: const Color(0xFF22C55E),
                           ),
+                    const SizedBox(height: 20),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Belum punya akun? ',
+                          style: TextStyle(color: Color(0xFF94A3B8)),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const RegisterPage(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'Daftar',
+                            style: TextStyle(
+                              color: Color(0xFF22C55E),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -174,4 +214,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}   
+}

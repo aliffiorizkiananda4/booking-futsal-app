@@ -11,7 +11,13 @@ class ItemModel {
     required this.status,
   });
 
-  static Object? fromJson(json) {}
+  static ItemModel? fromJson(Map<String, dynamic> json) {
+    return ItemModel(
+      name: json['name'] ?? '',
+      stock: json['stock'] ?? 0,
+      status: json['status'] ?? 'ok',
+    );
+  }
 }
 
 class ItemStatusTile extends StatelessWidget {
